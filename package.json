@@ -1,0 +1,11 @@
+{
+  "name": "songsbigdata",
+  "version": "1.0.0",
+  "description": "doing SQL work with node and a big list of songs",
+  "main": "songs.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "eqmvii",
+  "license": "ISC"
+}
