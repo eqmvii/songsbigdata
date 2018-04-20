@@ -20,7 +20,8 @@ connection.connect(function (err) {
     // songsByArtist("eminem");
     // artistsMoreThanOnce();
     // dataRange();
-    dataForSong("Hey Jude");
+    // dataForSong("Hey Jude");
+    SongAndAlbumSearch("Eminem");
 });
 
 function displayResults(res) {
@@ -84,6 +85,27 @@ function dataForSong(song) {
     connection.query("SELECT * FROM top5000 WHERE ?", { song: song }, function (err, res) {
         if (err) throw err;
         console.log(`${res[0].song} by ${res[0].artist} at ${res[0].raw_total} made up points`);
+        connection.end();
+    });
+}
+
+// finds a match where both album and song were in the top 100
+function SongAndAlbumSearch(artist) {
+    // "SELECT  FROM top5000 WHERE position BETWEEN ? AND ?";
+    var queryString = `SELECT s.song, a.artist, a.year, a.album, a.position as aPosition, s.position as sPosition
+    FROM top5000 as s
+    INNER JOIN topAlbums as a
+    ON a.year = s.year AND a.artist = s.artist
+    WHERE a.artist = ?
+    AND s.artist = ?
+    AND s.position < 100
+    AND a.position < 100;`
+    connection.query(queryString, [artist, artist], function (err, res) {
+        if (err) throw err;
+        console.log(res.length);
+        for (let i = 0; i < res.length; i++) {
+            console.log(res[i]);
+        }
         connection.end();
     });
 }
