@@ -1,4 +1,6 @@
 // songs.js
+// SQL queries against a huge database of songs
+// for learning
 
 var mysql = require("mysql");
 
@@ -15,7 +17,10 @@ connection.connect(function (err) {
     console.log(`connected as ${connection.threadId}`);
 
     // testConnection();
-    songsByArtist("eminem");
+    // songsByArtist("eminem");
+    // artistsMoreThanOnce();
+    // dataRange();
+    dataForSong("Hey Jude");
 });
 
 function displayResults(res) {
@@ -48,19 +53,38 @@ function songsByArtist(artist) {
 }
 
 function artistsMoreThanOnce() {
+    var queryString = `SELECT COUNT(artist), artist
+    FROM top5000
+    GROUP BY artist
+    HAVING COUNT(artist) > 30
+    ORDER BY COUNT(artist) DESC;`
+    connection.query(queryString, function (err, res) {
+        if (err) throw err;
+        for (let i = 0; i < res.length; i++) {
+            console.log(`${res[i].artist}: ${res[i]["COUNT(artist)"]}`);
+        }
+        connection.end();
+    });
+
 
 }
 
 function dataRange() {
+    // "SELECT  FROM top5000 WHERE position BETWEEN ? AND ?";
+    var queryString = `SELECT position,song,artist,year FROM top5000 WHERE year BETWEEN 2011 AND 2012;`
+    connection.query(queryString, function (err, res) {
+        if (err) throw err;
+        console.log(`There were ${res.length} results!`);
+        connection.end();
+    });
 
 }
 
-function dataForSong() {
-
+function dataForSong(song) {
+    connection.query("SELECT * FROM top5000 WHERE ?", { song: song }, function (err, res) {
+        if (err) throw err;
+        console.log(`${res[0].song} by ${res[0].artist} at ${res[0].raw_total} made up points`);
+        connection.end();
+    });
 }
-/*
-  * A query which returns all data for songs sung by a specific artist
-  * A query which returns all artists who appear within the top 5000 more than once
-  * A query which returns all data contained within a specific range
-  * A query which searches for a specific song in the top 5000 and returns the data for it
-*/
+
